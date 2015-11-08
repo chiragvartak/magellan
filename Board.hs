@@ -58,9 +58,9 @@ possible_moves_w pos = let
     empty = complement ((wp pos) .|. (wn pos) .|. (wb pos) .|. (wr pos) .|. (wq pos) .|. (wk pos) .|. (bp pos) .|. (bn pos)
         .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos))
     occupied = complement empty
-    list = possibleWP2 (history pos) (wp pos) (bp pos) not_white_pieces black_pieces empty
+    list = --possibleWP2 (history pos) (wp pos) (bp pos) not_white_pieces black_pieces empty
             --possibleWN
-            --possibleWB
+            possibleWB occupied (wb pos) not_white_pieces
             --possibleWR
             --possibleWQ
             --possibleWK
@@ -196,10 +196,66 @@ possibleWP2 history wp bp not_white_pieces black_pieces empty =
 
     in list
 
--- Some functions required for generating moves for sliding pieces
-{-
+-- Some functions required for generating moves for sliding pieces, and functions required for those functions
+reverse_bits :: Word64 -> Word64
+reverse_bits v = let
+    v0 = v
+    v1 = ( (shiftR v0 1) .&. 0x5555555555555555 ) .|. ( shiftL (v0 .&. 0x5555555555555555) 1 )
+    v2 = ( (shiftR v1 2) .&. 0x3333333333333333 ) .|. ( shiftL (v1 .&. 0x3333333333333333) 2 )
+    v3 = ( (shiftR v2 4) .&. 0x0F0F0F0F0F0F0F0F ) .|. ( shiftL (v2 .&. 0x0F0F0F0F0F0F0F0F) 4 )
+    v4 = ( (shiftR v3 8) .&. 0x00FF00FF00FF00FF ) .|. ( shiftL (v3 .&. 0x00FF00FF00FF00FF) 8 )
+    v5 = ((shiftR v4 16) .&. 0x0000FFFF0000FFFF ) .|. ( shiftL (v4 .&. 0x0000FFFF0000FFFF) 16)
+    v6 = ((shiftR v5 32) .&. 0x00000000FFFFFFFF ) .|. ( shiftL (v5 .&. 0x00000000FFFFFFFF) 32)
+    in v6
+
+-- h_and_v_moves and d_and_antid_moves are required generate the sliding moves required for generating bishop, rook and queen moves.
 h_and_v_moves :: Int -> Word64 -> Word64
 h_and_v_moves square occupied = let
-    binary_square = shiftL (1::Word64) s
-    possibilities_horizontal = 
--}
+    binary_square = shiftL (1::Word64) square
+    possibilities_horizontal = (occupied - 2*binary_square) `xor` (reverse_bits (reverse_bits occupied - 2 * reverse_bits binary_square))
+    possibilities_vertical = ((occupied .&. (file_masks_8 !! (square `mod` 8))) - (2 * binary_square)) `xor` (reverse_bits (reverse_bits (occupied .&. (file_masks_8 !! (square `mod` 8))) - (2 * reverse_bits binary_square) ))
+    in ( ( possibilities_horizontal .&. (rank_masks_8 !! (square `div` 8)) ) .|. possibilities_vertical .&. (file_masks_8 !! (square `mod` 8)) )
+
+d_and_antid_moves :: Int -> Word64 -> Word64
+d_and_antid_moves square occupied = let
+    binary_square = shiftL (1::Word64) square
+    possibilities_diagonal = ( (occupied .&. ( diagonal_masks_8 !! (square`div`8 + square`mod`8) ) ) - (2*binary_square) )
+                                `xor` reverse_bits ( reverse_bits ( occupied .&. (diagonal_masks_8 !! (square`div`8 + square`mod`8) ) ) - (2 * reverse_bits binary_square) )
+    possibilities_antidiagonal = ( (occupied .&. ( antidiagonal_masks_8 !! (square`div`8 + 7 - square`mod`8) ) ) - (2*binary_square) )
+                                `xor` reverse_bits ( reverse_bits ( occupied .&. (antidiagonal_masks_8 !! (square`div`8 + 7 - square`mod`8) ) ) - (2 * reverse_bits binary_square) )
+    in ( ( possibilities_diagonal .&. (diagonal_masks_8 !! (square`div`8 + square`mod`8) ) ) .|. ( possibilities_antidiagonal .&. (antidiagonal_masks_8 !! (square`div`8 + 7 - square`mod`8) ) ) )
+
+-- The two below loop constructs are directly required by possibleWB function
+-- These two are the loops that occur in the Java implementation done by Logic Chess Crazy
+-- The two loop constructs can prove to be a standard for converting imperation code to functional code.
+-- This is basically converting imperative code directly to functional code.
+-- The function possibleWB has become so complicated because there was a need to maintain 'states'.
+-- Though I have done this crudely by passing these variables (whose state needs to be maintained) as arguments to functions ..
+-- a better alternative, I think, would be monads, which I don't understand as of now.
+loop_j :: Word64 -> ByteString -> Word64 -> Int -> ByteString
+loop_j 0 list possibility i_location = list
+loop_j j list possibility i_location = let
+    index = countTrailingZeros j
+    list_mod = list `C.append` (C.pack $ show $ i_location`div`8) `C.append` (C.pack $ show $ i_location`mod`8)
+                `C.append` (C.pack $ show $ index`div`8) `C.append` (C.pack $ show $ index`mod`8)
+    possibility_mod = possibility .&. (complement j)
+    j_mod = possibility_mod .&. complement (possibility_mod-1)
+    in loop_j j_mod list_mod possibility_mod i_location
+
+loop_i :: Word64 -> Word64 -> ByteString -> Word64 -> Word64 -> Word64 -> ByteString
+loop_i 0 possibility list wb not_white_pieces occupied = list
+loop_i i possibility list wb not_white_pieces occupied = let
+    i_location = countTrailingZeros i
+    possibility_mod = d_and_antid_moves i_location occupied .&. not_white_pieces
+    j = possibility_mod .&. complement (possibility_mod-1)
+    list_mod = loop_j j list possibility_mod i_location
+    wb_mod = wb .&. complement i
+    i_mod = wb_mod .&. complement (wb_mod-1)
+    in loop_i i_mod possibility_mod list_mod wb_mod not_white_pieces occupied
+
+possibleWB :: Word64 -> Word64 -> Word64 -> ByteString
+possibleWB occupied wb not_white_pieces = let
+    i = wb .&. complement (wb-1)
+    dummy = 0
+    list = loop_i i dummy "" wb not_white_pieces occupied
+    in list
