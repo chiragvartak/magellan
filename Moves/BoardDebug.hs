@@ -1,8 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 
-module BoardDebug where
+module Moves.BoardDebug where
 
-import Board
+import Moves.HelperFunctions
+import Moves.Board
 import TimingDebug
 import Data.Bits
 import qualified Data.ByteString.Char8 as C
@@ -17,8 +18,18 @@ vboard1 =   ['r', 'n', '-', 'q', 'k', 'b', '-', 'r'
             ,'P', 'P', '-', '-', '-', 'P', '-', 'P'
             ,'R', 'N', '-', 'Q', 'K', 'B', '-', 'R']
 
+vboard2 =   ['-', '-', '-', '-', '-', '-', '-', '-'
+            ,'-', '-', '-', 'p', '-', '-', 'r', '-'
+            ,'-', '-', '-', '-', '-', '-', '-', '-'
+            ,'R', '-', '-', '-', '-', '-', '-', '-'
+            ,'-', '-', '-', 'Q', '-', '-', '-', 'k'
+            ,'-', '-', '-', '-', '-', '-', '-', '-'
+            ,'-', '-', '-', 'N', '-', '-', '-', '-'
+            ,'-', '-', '-', '-', '-', '-', '-', '-']
+
 -- Position constructed from the above vboard 
 pos1 = vboard_to_pos vboard1
+pos2 = vboard_to_pos vboard2
 
 -- A function for converting the visual board into a Postion datatype. Will be useful for debugging.
 vboard_to_pos :: [Char] -> Position
