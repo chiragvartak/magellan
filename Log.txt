@@ -1,0 +1,6 @@
+-- Function for white king moves
+Done.
+
+-- Create all the functions and update the code as shown in Tutorial 13
+
+[Note: Compiler will warn you about tabs. Don't worry about it.]
