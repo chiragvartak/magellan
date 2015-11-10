@@ -43,8 +43,8 @@ king_side = 17361641481138401520::Word64
 queen_side = 1085102592571150095::Word64
 king_span = 460039::Word64;
 knight_span = 43234889994::Word64;
--- not_white_pieces : Pieces that CANNOT be captured by white; includes black king
--- black_pieces : Pieces that CAN be captured by white; doesn't include black king
+-- cannot_capture : Pieces that CANNOT be captured by white; includes black king
+-- can_capture : Pieces that CAN be captured by white; doesn't include black king
 -- empty : Empty squares
 
 rank_masks_8 = [0xFF, 0xFF00, 0xFF0000, 0xFF000000, 0xFF00000000, 0xFF0000000000, 0xFF000000000000, 0xFF00000000000000]

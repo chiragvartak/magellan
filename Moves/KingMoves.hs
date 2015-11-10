@@ -2,7 +2,7 @@
 
 module Moves.KingMoves
 	( unsafe_for_black
-	, possibleWK
+	, possibleK
 	)where
 
 import Moves.HelperFunctions
@@ -50,15 +50,50 @@ unsafe_for_black wp wn wb wr wq wk bp bn bb br bq bk = let
 
 	in unsafe_6
 
-possibleWK :: Word64 -> Word64 -> Word64 -> ByteString
-possibleWK occupied wk not_white_pieces = let
-	i_location = countTrailingZeros wk
+unsafe_for_white :: Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64
+unsafe_for_white wp wn wb wr wq wk bp bn bb br bq bk = let
+	occupied = wp .|. wn .|. wb .|. wr .|. wq .|. wk .|. bp .|. bn .|. bb .|. br .|. bq .|. bk
+	
+	-- Pawn
+	unsafe_1 = (shiftL bp 7) .&. (complement file_h)
+	unsafe_2 = unsafe_1 .|. ( (shiftL bp 9) .&. (complement file_a) )
+
+	-- Knight
+	i_knight = bn .&. complement (bn-1)
+	dummy = 0
+	unsafe_3 = loop_i_knight i_knight dummy unsafe_2 bn
+
+	-- Bishop/Queen
+	qb = bq .|. bb
+	i_qb = qb .&. complement (qb-1)
+	unsafe_4 = loop_i_qb i_qb dummy unsafe_3 qb occupied
+
+	-- Rook/Queen
+	qr = bq .|. br
+	i_qr = qr .&. complement (qr-1)
+	unsafe_5 = loop_i_qr i_qr dummy unsafe_4 qr occupied
+
+	-- King
+	i_locn_king = countTrailingZeros bk
+	possibility_king_1 = if(i_locn_king > 9)
+		then shiftL king_span (i_locn_king-9)
+		else shiftR king_span (9-i_locn_king)
+	possibility_king_2 = if(i_locn_king`mod`8 < 4)
+		then possibility_king_1 .&. complement file_gh
+		else possibility_king_1 .&. complement file_ab
+	unsafe_6 = unsafe_5 .|. possibility_king_2
+
+	in unsafe_6
+
+possibleK :: Word64 -> Word64 -> Word64 -> ByteString
+possibleK occupied k cannot_capture = let
+	i_location = countTrailingZeros k
 	possibility_1 = if(i_location > 9)
 		then shiftL king_span (i_location-9)
 		else shiftR king_span (9 - i_location)
 	possibility_2 = if(i_location`mod`8 < 4)
-		then possibility_1 .&. ( complement file_gh .&. not_white_pieces )
-		else possibility_1 .&. ( complement file_ab .&. not_white_pieces )
+		then possibility_1 .&. ( complement file_gh .&. cannot_capture )
+		else possibility_1 .&. ( complement file_ab .&. cannot_capture )
 	j = possibility_2 .&. complement (possibility_2-1)
 	list = loop_j j "" possibility_2 i_location
 	in list

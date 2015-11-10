@@ -20,15 +20,30 @@ type ByteString = C.ByteString
 -- If you want just one, say, pawn moves, comment the rest in this function and debug. 
 possible_moves_w :: Position -> ByteString
 possible_moves_w pos = let
-    not_white_pieces = complement (wp pos .|. wn pos .|. wb pos .|. wr pos .|. wq pos .|. wk pos .|. bk pos)
-    black_pieces = bp pos .|. bn pos .|. bb pos .|. br pos .|. bq pos
-    empty = complement ((wp pos) .|. (wn pos) .|. (wb pos) .|. (wr pos) .|. (wq pos) .|. (wk pos) .|. (bp pos) .|. (bn pos)
-        .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos))
-    occupied = complement empty
-    list = possibleWP2 (history pos) (wp pos) (bp pos) not_white_pieces black_pieces empty
-            `C.append` possibleWN occupied (wn pos) not_white_pieces
-            `C.append` possibleWB occupied (wb pos) not_white_pieces
-            `C.append` possibleWR occupied (wr pos) not_white_pieces
-            `C.append` possibleWQ occupied (wq pos) not_white_pieces
-            `C.append` possibleWK occupied (wk pos) not_white_pieces
+    cannot_capture = complement (wp pos .|. wn pos .|. wb pos .|. wr pos .|. wq pos .|. wk pos .|. bk pos)
+    can_capture = bp pos .|. bn pos .|. bb pos .|. br pos .|. bq pos
+    occupied = (wp pos) .|. (wn pos) .|. (wb pos) .|. (wr pos) .|. (wq pos) .|. (wk pos) .|. (bp pos) .|. (bn pos)
+                .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos)
+    empty = complement occupied
+    list = possibleWP2 (history pos) (wp pos) (bp pos) cannot_capture can_capture empty
+            `C.append` possibleN occupied (wn pos) cannot_capture
+            `C.append` possibleB occupied (wb pos) cannot_capture
+            `C.append` possibleR occupied (wr pos) cannot_capture
+            `C.append` possibleQ occupied (wq pos) cannot_capture
+            `C.append` possibleK occupied (wk pos) cannot_capture
+    in list
+
+possible_moves_b :: Position -> ByteString
+possible_moves_b pos = let
+    cannot_capture = complement (bp pos .|. bn pos .|. bb pos .|. br pos .|. bq pos .|. bk pos .|. wk pos)
+    can_capture = wp pos .|. wn pos .|. wb pos .|. wr pos .|. wq pos
+    occupied = (wp pos) .|. (wn pos) .|. (wb pos) .|. (wr pos) .|. (wq pos) .|. (wk pos) .|. (bp pos) .|. (bn pos)
+                .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos)
+    empty = complement occupied
+    list = possibleBP2 (history pos) (wp pos) (bp pos) cannot_capture can_capture empty
+            `C.append` possibleN occupied (bn pos) cannot_capture
+            `C.append` possibleB occupied (bb pos) cannot_capture
+            `C.append` possibleR occupied (br pos) cannot_capture
+            `C.append` possibleQ occupied (bq pos) cannot_capture
+            `C.append` possibleK occupied (bk pos) cannot_capture
     in list
