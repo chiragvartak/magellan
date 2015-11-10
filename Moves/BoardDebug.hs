@@ -10,14 +10,14 @@ import Data.Bits
 import qualified Data.ByteString.Char8 as C
 
 -- Just a chess board that can be used for debugging
-vboard1 =   ['r', 'n', '-', 'q', 'k', 'b', '-', 'r'
-            ,'P', '-', 'p', '-', '-', 'p', 'P', '-'
+vboard1 =   ['r', 'n', '-', '-', 'k', 'b', '-', 'r'
+            ,'-', '-', 'p', '-', '-', 'p', 'P', '-'
             ,'-', '-', '-', '-', 'p', 'n', '-', '-'
-            ,'-', 'p', 'P', 'p', '-', '-', 'P', 'p'
-            ,'-', '-', '-', 'P', '-', '-', '-', '-'
+            ,'-', '-', 'P', 'p', '-', '-', 'P', 'p'
+            ,'P', 'p', '-', 'P', '-', '-', '-', '-'
             ,'-', 'b', 'B', '-', 'P', 'N', '-', '-'
-            ,'P', 'P', '-', '-', '-', 'P', '-', 'P'
-            ,'R', 'N', '-', 'Q', 'K', 'B', '-', 'R']
+            ,'-', 'P', '-', '-', '-', 'P', 'p', 'P'
+            ,'R', 'N', '-', 'Q', 'K', 'B', '-', 'q']
 
 vboard2 =   ['-', '-', '-', '-', '-', '-', '-', '-'
             ,'-', '-', '-', '-', '-', '-', '-', '-'
@@ -36,7 +36,7 @@ pos2 = vboard_to_pos vboard2
 vboard_to_pos :: [Char] -> Position
 vboard_to_pos vboard = 
     let vboard_modified = zip vboard [0..] -- A vboard that is a list of tuples like ('P', 54)
-    in Position { history = "cx471131"::ByteString
+    in Position { history = "cx47----1131----6040"::ByteString
                 , wp = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'P']
                 , wn = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'N']
                 , wb = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'B']

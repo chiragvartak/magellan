@@ -1,7 +1,7 @@
 {-# LANGUAGE OverloadedStrings #-}
 
 module Moves.KnightMoves
-    ( possibleWN
+    ( possibleN
     ) where
 
 import Moves.HelperFunctions
@@ -23,24 +23,24 @@ loop_j j list possibility i_location = let
     in loop_j j_mod list_mod possibility_mod i_location
 
 loop_i :: Word64 -> Word64 -> ByteString -> Word64 -> Word64 -> Word64 -> ByteString
-loop_i 0 possibility list wn not_white_pieces occupied = list
-loop_i i possibility list wn not_white_pieces occupied = let
+loop_i 0 possibility list wn cannot_capture occupied = list
+loop_i i possibility list wn cannot_capture occupied = let
     i_location = countTrailingZeros i
     possibility_mod0 = if(i_location > 18)
         then shiftL knight_span (i_location-18)
         else shiftR knight_span (18-i_location)
     possibility_mod = if(i_location`mod`8 < 4)
-        then possibility_mod0 .&. (complement file_gh) .&. not_white_pieces
-        else possibility_mod0 .&. (complement file_ab) .&. not_white_pieces
+        then possibility_mod0 .&. (complement file_gh) .&. cannot_capture
+        else possibility_mod0 .&. (complement file_ab) .&. cannot_capture
     j = possibility_mod .&. complement (possibility_mod-1)
     list_mod = loop_j j list possibility_mod i_location
     wn_mod = wn .&. complement i
     i_mod = wn_mod .&. complement (wn_mod-1)
-    in loop_i i_mod possibility_mod list_mod wn_mod not_white_pieces occupied
+    in loop_i i_mod possibility_mod list_mod wn_mod cannot_capture occupied
 
-possibleWN :: Word64 -> Word64 -> Word64 -> ByteString
-possibleWN occupied wn not_white_pieces = let
-    i = wn .&. complement (wn-1)
+possibleN :: Word64 -> Word64 -> Word64 -> ByteString
+possibleN occupied n cannot_capture = let
+    i = n .&. complement (n-1)
     dummy = 0
-    list = loop_i i dummy "" wn not_white_pieces occupied
+    list = loop_i i dummy "" n cannot_capture occupied
     in list
