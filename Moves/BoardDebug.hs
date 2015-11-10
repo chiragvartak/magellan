@@ -2,6 +2,7 @@
 
 module Moves.BoardDebug where
 
+import Moves.KingMoves
 import Moves.HelperFunctions
 import Moves.Board
 import TimingDebug
@@ -19,12 +20,12 @@ vboard1 =   ['r', 'n', '-', 'q', 'k', 'b', '-', 'r'
             ,'R', 'N', '-', 'Q', 'K', 'B', '-', 'R']
 
 vboard2 =   ['-', '-', '-', '-', '-', '-', '-', '-'
-            ,'-', '-', '-', 'p', '-', '-', 'r', '-'
             ,'-', '-', '-', '-', '-', '-', '-', '-'
-            ,'R', '-', '-', '-', '-', '-', '-', '-'
-            ,'-', '-', '-', 'Q', '-', '-', '-', 'k'
+            ,'-', '-', 'k', '-', '-', '-', '-', '-'
+            ,'r', '-', '-', '-', '-', '-', '-', '-'
+            ,'-', '-', '-', '-', '-', 'K', '-', '-'
+            ,'-', '-', '-', '-', 'R', '-', '-', '-'
             ,'-', '-', '-', '-', '-', '-', '-', '-'
-            ,'-', '-', '-', 'N', '-', '-', '-', '-'
             ,'-', '-', '-', '-', '-', '-', '-', '-']
 
 -- Position constructed from the above vboard 
@@ -79,3 +80,4 @@ view4 bs =
         bs
     else
         (C.take 4 bs) `C.append` " " `C.append` (view4 $ C.drop 4 bs)
+        

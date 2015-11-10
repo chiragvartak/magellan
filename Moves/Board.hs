@@ -7,6 +7,8 @@ import Moves.PawnMoves
 import Moves.BishopMoves
 import Moves.RookMoves
 import Moves.QueenMoves
+import Moves.KnightMoves
+import Moves.KingMoves
 import qualified Data.Word
 import Data.Bits
 import qualified Data.ByteString.Char8 as C
@@ -24,9 +26,9 @@ possible_moves_w pos = let
         .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos))
     occupied = complement empty
     list = possibleWP2 (history pos) (wp pos) (bp pos) not_white_pieces black_pieces empty
-            --possibleWN
+            `C.append` possibleWN occupied (wn pos) not_white_pieces
             `C.append` possibleWB occupied (wb pos) not_white_pieces
             `C.append` possibleWR occupied (wr pos) not_white_pieces
             `C.append` possibleWQ occupied (wq pos) not_white_pieces
-            --possibleWK
+            `C.append` possibleWK occupied (wk pos) not_white_pieces
     in list

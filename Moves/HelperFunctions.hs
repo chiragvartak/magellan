@@ -6,7 +6,7 @@ module Moves.HelperFunctions
 	( reverse_bits
 	, h_and_v_moves
 	, d_and_antid_moves
-    , file_a, file_h, file_ab, file_gh, rank_8, rank_5, rank_4, rank_1, centre, extended_centre, king_side, queen_side
+    , file_a, file_h, file_ab, file_gh, rank_8, rank_5, rank_4, rank_1, centre, extended_centre, king_side, queen_side, king_span, knight_span
     , rank_masks_8, file_masks_8, diagonal_masks_8, antidiagonal_masks_8
     , Position(..)
 	) where
@@ -41,6 +41,8 @@ centre = 103481868288::Word64
 extended_centre = 66229406269440::Word64
 king_side = 17361641481138401520::Word64
 queen_side = 1085102592571150095::Word64
+king_span = 460039::Word64;
+knight_span = 43234889994::Word64;
 -- not_white_pieces : Pieces that CANNOT be captured by white; includes black king
 -- black_pieces : Pieces that CAN be captured by white; doesn't include black king
 -- empty : Empty squares
