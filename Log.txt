@@ -1,20 +1,29 @@
 -- Function for white king moves
 Done.
 
-
 -- Create all the functions and update the code as shown in Tutorial 13
 Done.
 
-
 Note: Compiler will warn you about tabs. Don't worry about it.
 
-
 Note:
-
-Pieces that CANNOT be captured by white:
+- Pieces that CANNOT be captured by white:
 WP | WN | WB | WR | WQ | WK | BK
-1. not_white_pieces (prev) = not_my_pieces (Jon,new) = cannot_capture (mine)
-
-Pieces that CAN be captured by white:
+not_white_pieces (prev) = not_my_pieces (Jon,new) = cannot_capture (mine)
+- Pieces that CAN be captured by white:
 BP | BN | BB | BR | BQ
-2. black_pieces (prev) = my_pieces (Jon,new) = can_capture (mine)
+black_pieces (prev) = my_pieces (Jon,new) = can_capture (mine)
+
+-- Code Castling moves
+[Later]
+
+-- Make all the necessary changes to put an en passant bitboard in 'Position' and all the changes resulting from it.
+[Later]
+
+-- Make all the necessary changes to put castling booleans in 'Position' and all the changes resulting from it.
+[Later]
+
+-- Do a rigorous Perft Debugging
+[Later]
+
+-- Create the makeMove method

@@ -36,7 +36,7 @@ pos2 = vboard_to_pos vboard2
 vboard_to_pos :: [Char] -> Position
 vboard_to_pos vboard = 
     let vboard_modified = zip vboard [0..] -- A vboard that is a list of tuples like ('P', 54)
-    in Position { history = "cx47----1131----6040"::ByteString
+    in Position { history = "cx470000"::ByteString
                 , wp = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'P']
                 , wn = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'N']
                 , wb = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'B']
