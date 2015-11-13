@@ -9,6 +9,7 @@ import Moves.RookMoves
 import Moves.QueenMoves
 import Moves.KnightMoves
 import Moves.KingMoves
+import Moves.CastlingMoves
 import qualified Data.Word
 import Data.Bits
 import qualified Data.ByteString.Char8 as C
@@ -25,12 +26,13 @@ possible_moves_w pos = let
     occupied = (wp pos) .|. (wn pos) .|. (wb pos) .|. (wr pos) .|. (wq pos) .|. (wk pos) .|. (bp pos) .|. (bn pos)
                 .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos)
     empty = complement occupied
-    list = possibleWP2 (history pos) (wp pos) (bp pos) cannot_capture can_capture empty
+    list = possibleWP2 (history pos) (wp pos) (bp pos) (ep pos) cannot_capture can_capture empty
             `C.append` possibleN occupied (wn pos) cannot_capture
             `C.append` possibleB occupied (wb pos) cannot_capture
             `C.append` possibleR occupied (wr pos) cannot_capture
             `C.append` possibleQ occupied (wq pos) cannot_capture
             `C.append` possibleK occupied (wk pos) cannot_capture
+            `C.append` possibleCW (wr pos) (cwk pos) (cwq pos) occupied
     in list
 
 possible_moves_b :: Position -> ByteString
@@ -40,10 +42,11 @@ possible_moves_b pos = let
     occupied = (wp pos) .|. (wn pos) .|. (wb pos) .|. (wr pos) .|. (wq pos) .|. (wk pos) .|. (bp pos) .|. (bn pos)
                 .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos)
     empty = complement occupied
-    list = possibleBP2 (history pos) (wp pos) (bp pos) cannot_capture can_capture empty
+    list = possibleBP2 (history pos) (wp pos) (bp pos) (ep pos) cannot_capture can_capture empty
             `C.append` possibleN occupied (bn pos) cannot_capture
             `C.append` possibleB occupied (bb pos) cannot_capture
             `C.append` possibleR occupied (br pos) cannot_capture
             `C.append` possibleQ occupied (bq pos) cannot_capture
             `C.append` possibleK occupied (bk pos) cannot_capture
+            `C.append` possibleCB (br pos) (cbk pos) (cbq pos) occupied
     in list

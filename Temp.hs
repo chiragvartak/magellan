@@ -21,10 +21,17 @@ data Person = Person {firstName :: String
                      , flavor :: String  
                      } deriving (Show)   
 
+-- Slice the ByteString from index m to n, n exclusive
+slice :: ByteString -> Int -> Int -> ByteString
+slice str m n = C.drop m (C.take n str)
+
 string1 :: ByteString
 string1 = "Darth Vader"
 
 string2 :: ByteString
 string2 = "Obi-Wan Kenobi"
 
+string3 :: ByteString
+string3 = "Darth Vader"
 
+bool1 = string3 == "Darth Vader"

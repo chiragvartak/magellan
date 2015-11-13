@@ -15,8 +15,8 @@ type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
 
 -- This function generates the possible moves for white pawns
-possibleWP2 :: ByteString -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> ByteString
-possibleWP2 history wp bp cannot_capture can_capture empty = 
+possibleWP2 :: ByteString -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> ByteString
+possibleWP2 history wp bp ep cannot_capture can_capture empty = 
     let
         pawn_moves_top_right = (shiftR wp 7) .&. can_capture .&. (complement rank_8) .&. (complement file_a)
         move1 i = (C.pack $ show $ i`div`8+1) `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8)
@@ -63,11 +63,12 @@ possibleWP2 history wp bp cannot_capture can_capture empty =
                                     (digitToInt (C.index history (C.length history - 2)) - digitToInt (C.index history (C.length history - 4)) `elem` [-2,2])
         e_file = digitToInt (C.index history (C.length history - 1))
         -- shows the piece to remove, not the destination
-        en_passant_right_bb = (shiftL wp 1) .&. bp .&. (rank_5) .&. (complement file_a) .&. (file_masks_8 !! e_file)
+        en_passant_right_bb = (shiftL wp 1) .&. bp .&. (rank_5) .&. (complement file_a) .&. ep
         list8 = if (is_2_steps_move==True && en_passant_right_bb/=0)
                 then
                     let
-                        move i = (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`div`8-1) `C.append` (C.pack $ show $ i`mod`8)
+                        --move i = (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`div`8-1) `C.append` (C.pack $ show $ i`mod`8)
+                        move i = (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "WE"
                         list = C.concat [move i | i <- [0..63], (shiftR en_passant_right_bb i).&.1 == 1]
                     in list
                 else
@@ -75,11 +76,12 @@ possibleWP2 history wp bp cannot_capture can_capture empty =
 
         -- en passant left
         -- shows the piece to remove, not the destination
-        en_passant_left_bb = (shiftR wp 1) .&. bp .&. (rank_5) .&. (complement file_h) .&. (file_masks_8 !! e_file)
+        en_passant_left_bb = (shiftR wp 1) .&. bp .&. (rank_5) .&. (complement file_h) .&. ep
         list9 = if (is_2_steps_move==True && en_passant_left_bb/=0)
                 then
                     let
-                        move i = (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`div`8-1) `C.append` (C.pack $ show $ i`mod`8)
+                        --move i = (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`div`8-1) `C.append` (C.pack $ show $ i`mod`8)
+                        move i = (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "WE"
                         list = C.concat [move i | i <- [0..63], (shiftR en_passant_left_bb i).&.1 == 1]
                     in list
                 else
@@ -89,8 +91,8 @@ possibleWP2 history wp bp cannot_capture can_capture empty =
 
     in list
 
-possibleBP2 :: ByteString -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> ByteString
-possibleBP2 history wp bp cannot_capture can_capture empty = 
+possibleBP2 :: ByteString -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> Word64 -> ByteString
+possibleBP2 history wp bp ep cannot_capture can_capture empty = 
     let
         pawn_moves_top_right = (shiftL bp 7) .&. can_capture .&. (complement rank_1) .&. (complement file_h)
         move1 i = (C.pack $ show $ i`div`8-1) `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8)
@@ -111,24 +113,24 @@ possibleBP2 history wp bp cannot_capture can_capture empty =
         -- Functions for pawn moves by promotion are below.
         -- Pawn promotion by capturing top right
         pawn_promotion_top_right = (shiftL bp 7) .&. can_capture .&. rank_1 .&. (complement file_h)
-        move5 i = (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "QP" 
-                    `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "RP" 
-                    `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "BP" 
-                    `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "NP" 
+        move5 i = (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "qP" 
+                    `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "rP" 
+                    `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "bP" 
+                    `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "nP" 
         list5 = C.concat [move5 i | i <- [0..63], (shiftR pawn_promotion_top_right i).&.1 == 1]
 
         pawn_promotion_top_left = (shiftL bp 9) .&. can_capture .&. rank_1 .&. (complement file_a)
-        move6 i = (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "QP"
-                    `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "RP"
-                    `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "BP"
-                    `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "NP"
+        move6 i = (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "qP"
+                    `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "rP"
+                    `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "bP"
+                    `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "nP"
         list6 = C.concat [move6 i | i <- [0..63], (shiftR pawn_promotion_top_left i).&.1 == 1]
 
         pawn_promotion_1_forward = (shiftL bp 8) .&. empty .&. rank_1
-        move7 i = (C.pack $ show $ i`mod`8) `C.append` (C.pack $ show $ i`mod`8) `C.append` "QP"
-                    `C.append` (C.pack $ show $ i`mod`8) `C.append` (C.pack $ show $ i`mod`8) `C.append` "RP"
-                    `C.append` (C.pack $ show $ i`mod`8) `C.append` (C.pack $ show $ i`mod`8) `C.append` "BP"
-                    `C.append` (C.pack $ show $ i`mod`8) `C.append` (C.pack $ show $ i`mod`8) `C.append` "NP"
+        move7 i = (C.pack $ show $ i`mod`8) `C.append` (C.pack $ show $ i`mod`8) `C.append` "qP"
+                    `C.append` (C.pack $ show $ i`mod`8) `C.append` (C.pack $ show $ i`mod`8) `C.append` "rP"
+                    `C.append` (C.pack $ show $ i`mod`8) `C.append` (C.pack $ show $ i`mod`8) `C.append` "bP"
+                    `C.append` (C.pack $ show $ i`mod`8) `C.append` (C.pack $ show $ i`mod`8) `C.append` "nP"
         list7 = C.concat [move7 i | i <- [0..63], (shiftR pawn_promotion_1_forward i).&.1 == 1]
 
         -- en passant right
@@ -137,11 +139,12 @@ possibleBP2 history wp bp cannot_capture can_capture empty =
                                     (digitToInt (C.index history (C.length history - 2)) - digitToInt (C.index history (C.length history - 4)) `elem` [-2,2])
         e_file = digitToInt (C.index history (C.length history - 1))
         -- shows the piece to remove, not the destination
-        en_passant_right_bb = (shiftR bp 1) .&. wp .&. (rank_4) .&. (complement file_h) .&. (file_masks_8 !! e_file)
+        en_passant_right_bb = (shiftR bp 1) .&. wp .&. (rank_4) .&. (complement file_h) .&. ep
         list8 = if (is_2_steps_move==True && en_passant_right_bb/=0)
                 then
                     let
-                        move i = (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`div`8+1) `C.append` (C.pack $ show $ i`mod`8)
+                        --move i = (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`div`8+1) `C.append` (C.pack $ show $ i`mod`8)
+                        move i  = (C.pack $ show $ i`mod`8+1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "BE"
                         list = C.concat [move i | i <- [0..63], (shiftR en_passant_right_bb i).&.1 == 1]
                     in list
                 else
@@ -153,7 +156,8 @@ possibleBP2 history wp bp cannot_capture can_capture empty =
         list9 = if (is_2_steps_move==True && en_passant_left_bb/=0)
                 then
                     let
-                        move i = (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`div`8+1) `C.append` (C.pack $ show $ i`mod`8)
+                        --move i = (C.pack $ show $ i`div`8) `C.append` (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`div`8+1) `C.append` (C.pack $ show $ i`mod`8)
+                        move i  = (C.pack $ show $ i`mod`8-1) `C.append` (C.pack $ show $ i`mod`8) `C.append` "BE"
                         list = C.concat [move i | i <- [0..63], (shiftR en_passant_left_bb i).&.1 == 1]
                     in list
                 else

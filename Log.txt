@@ -26,4 +26,7 @@ black_pieces (prev) = my_pieces (Jon,new) = can_capture (mine)
 -- Do a rigorous Perft Debugging
 [Later]
 
--- Create the makeMove method
+-- Create the makeMove method (Tutorial 16)
+
+-- Create a method for importing FEN Strings (Tutorial 18)
+[Low Priority]

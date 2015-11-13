@@ -10,14 +10,14 @@ import Data.Bits
 import qualified Data.ByteString.Char8 as C
 
 -- Just a chess board that can be used for debugging
-vboard1 =   ['r', 'n', '-', '-', 'k', 'b', '-', 'r'
+vboard1 =   ['r', '-', '-', '-', 'k', '-', '-', 'r'
             ,'-', '-', 'p', '-', '-', 'p', 'P', '-'
             ,'-', '-', '-', '-', 'p', 'n', '-', '-'
             ,'-', '-', 'P', 'p', '-', '-', 'P', 'p'
             ,'P', 'p', '-', 'P', '-', '-', '-', '-'
             ,'-', 'b', 'B', '-', 'P', 'N', '-', '-'
-            ,'-', 'P', '-', '-', '-', 'P', 'p', 'P'
-            ,'R', 'N', '-', 'Q', 'K', 'B', '-', 'q']
+            ,'-', 'P', 'Q', '-', '-', 'P', 'p', 'P'
+            ,'R', '-', '-', '-', 'K', 'B', '-', 'q']
 
 vboard2 =   ['-', '-', '-', '-', '-', '-', '-', '-'
             ,'-', '-', '-', '-', '-', '-', '-', '-'
@@ -48,7 +48,13 @@ vboard_to_pos vboard =
                 , bb = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'b']
                 , br = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'r']
                 , bq = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'q']
-                , bk = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'k'] }
+                , bk = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'k'] 
+                , ep = 0
+                , cwk = False
+                , cwq = True
+                , cbk = True
+                , cbq = True
+                }
 
 -- Helper function for above
 -- Takes the a list of the bit-numbers and sets them to 1, thereby generating a bitboard

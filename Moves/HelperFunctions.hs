@@ -8,6 +8,7 @@ module Moves.HelperFunctions
 	, d_and_antid_moves
     , file_a, file_h, file_ab, file_gh, rank_8, rank_5, rank_4, rank_1, centre, extended_centre, king_side, queen_side, king_span, knight_span
     , rank_masks_8, file_masks_8, diagonal_masks_8, antidiagonal_masks_8
+    , castle_rooks
     , Position(..)
 	) where
 
@@ -23,9 +24,9 @@ type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
 
 -- This construct contains all the information required to represent a state completely.
--- Does it?
-data Position = Position { history :: ByteString, wp :: Word64, wn :: Word64, wb :: Word64, wr :: Word64, wq :: Word64, wk :: Word64
+data Position = Position {history:: ByteString, wp :: Word64, wn :: Word64, wb :: Word64, wr :: Word64, wq :: Word64, wk :: Word64
                         , bp :: Word64, bn :: Word64, bb :: Word64, br :: Word64, bq :: Word64, bk :: Word64
+                        , ep :: Word64, cwk :: Bool, cwq :: Bool, cbk :: Bool, cbq :: Bool
                         } deriving (Show)
 
 -- Things required for the move generation functions
@@ -46,14 +47,15 @@ knight_span = 43234889994::Word64;
 -- cannot_capture : Pieces that CANNOT be captured by white; includes black king
 -- can_capture : Pieces that CAN be captured by white; doesn't include black king
 -- empty : Empty squares
+castle_rooks = [63::Int, 56, 7, 0]
 
-rank_masks_8 = [0xFF, 0xFF00, 0xFF0000, 0xFF000000, 0xFF00000000, 0xFF0000000000, 0xFF000000000000, 0xFF00000000000000]
-file_masks_8 = [0x101010101010101, 0x202020202020202, 0x404040404040404, 0x808080808080808,
+rank_masks_8 = [0xFF::Word64, 0xFF00, 0xFF0000, 0xFF000000, 0xFF00000000, 0xFF0000000000, 0xFF000000000000, 0xFF00000000000000]
+file_masks_8 = [0x101010101010101::Word64, 0x202020202020202, 0x404040404040404, 0x808080808080808,
                 0x1010101010101010, 0x2020202020202020, 0x4040404040404040, 0x8080808080808080]
-diagonal_masks_8 = [0x1, 0x102, 0x10204, 0x1020408, 0x102040810, 0x10204081020, 0x1020408102040, 0x102040810204080,
+diagonal_masks_8 = [0x1::Word64, 0x102, 0x10204, 0x1020408, 0x102040810, 0x10204081020, 0x1020408102040, 0x102040810204080,
                     0x204081020408000, 0x408102040800000, 0x810204080000000, 0x1020408000000000, 0x2040800000000000,
                     0x4080000000000000, 0x8000000000000000]
-antidiagonal_masks_8 = [0x80, 0x8040, 0x804020, 0x80402010, 0x8040201008, 0x804020100804, 0x80402010080402,
+antidiagonal_masks_8 = [0x80::Word64, 0x8040, 0x804020, 0x80402010, 0x8040201008, 0x804020100804, 0x80402010080402,
                         0x8040201008040201, 0x4020100804020100, 0x2010080402010000, 0x1008040201000000, 0x804020100000000,
                         0x402010000000000, 0x201000000000000, 0x100000000000000]
 

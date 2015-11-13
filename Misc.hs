@@ -24,11 +24,3 @@ reverse_bits v = let
 	v5 = ((shiftR v4 16) .&. 0x0000FFFF0000FFFF ) .|. ( shiftL (v4 .&. 0x0000FFFF0000FFFF) 16)
 	v6 = ((shiftR v5 32) .&. 0x00000000FFFFFFFF ) .|. ( shiftL (v5 .&. 0x00000000FFFFFFFF) 32)
 	in v6
-
-func1 x = 2*x + gank
-
-func2 y =
-	let
-	gank = 5
-	--func1 1
-	in 6
