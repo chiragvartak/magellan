@@ -24,7 +24,7 @@ type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
 
 -- This construct contains all the information required to represent a state completely.
-data Position = Position {wp :: Word64, wn :: Word64, wb :: Word64, wr :: Word64, wq :: Word64, wk :: Word64
+data Position = Position {history:: ByteString, wp :: Word64, wn :: Word64, wb :: Word64, wr :: Word64, wq :: Word64, wk :: Word64
                         , bp :: Word64, bn :: Word64, bb :: Word64, br :: Word64, bq :: Word64, bk :: Word64
                         , ep :: Word64, cwk :: Bool, cwq :: Bool, cbk :: Bool, cbq :: Bool
                         } deriving (Show)
