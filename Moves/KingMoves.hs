@@ -2,6 +2,7 @@
 
 module Moves.KingMoves
 	( unsafe_for_black
+	, unsafe_for_white
 	, possibleK
 	)where
 

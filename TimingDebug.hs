@@ -7,8 +7,8 @@ import Control.Parallel.Strategies
 import Control.Monad
 import System.Environment
 
--- Timing an IO Action 
--- Just run 'time_io <IO Action>' in ghci
+-- Timing an IO Action
+-- Just run 'time_io <IO Action> <repititions>' in ghci
 -- Performs an IO Action 'repetitions' number of times
 time_io :: IO t -> Integer -> IO ()
 time_io a repetitions = do
@@ -26,7 +26,7 @@ time_io_helper a 0 = return ()
 time_io_helper a repetitions = do
 	v <- a
 	time_io_helper a (repetitions-1)
-	
+
 main = do
 	putStrLn "Eric. Charles."
 

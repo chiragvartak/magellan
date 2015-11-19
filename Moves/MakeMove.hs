@@ -15,6 +15,7 @@ import Data.Char (digitToInt, isDigit, isUpper)
 type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
 
+-- Takes a bitboard and a move and modifies the bitboard according to that move
 make_move :: Word64 -> ByteString -> Char -> Word64
 make_move board move piece_type
     | (isDigit $ C.index move 3) = let
@@ -62,6 +63,7 @@ make_move board move piece_type
                     in board_2
                 else board_mod
             in board_mod_2
+    | otherwise = 0
 
 make_move_castle :: Word64 -> Word64 -> ByteString -> Char -> Word64
 make_move_castle rook_board king_board move piece_type =
