@@ -1,15 +1,15 @@
 -- This GHC extension makes the string literals polymorphic.
--- This makes it easy to use ByteStrings. 
+-- This makes it easy to use ByteStrings.
 {-# LANGUAGE OverloadedStrings #-}
 
 module Moves.HelperFunctions
 	( reverse_bits
 	, h_and_v_moves
 	, d_and_antid_moves
-    , file_a, file_h, file_ab, file_gh, rank_8, rank_5, rank_4, rank_1, centre, extended_centre, king_side, queen_side, king_span, knight_span
-    , rank_masks_8, file_masks_8, diagonal_masks_8, antidiagonal_masks_8
-    , castle_rooks
-    , Position(..)
+  , file_a, file_h, file_ab, file_gh, rank_8, rank_5, rank_4, rank_1, centre, extended_centre, king_side, queen_side, king_span, knight_span
+  , rank_masks_8, file_masks_8, diagonal_masks_8, antidiagonal_masks_8
+  , castle_rooks
+  , Position(..)
 	) where
 
 import qualified Data.Word

@@ -2,6 +2,7 @@
 
 module Moves.Perft
     ( perft
+    , perft_root
     ) where
 
 import Moves.HelperFunctions
@@ -21,9 +22,9 @@ perft_max_depth = 3
 -- Takes as inputs Position and whose turn it is to move and returns the number of 'moves' from that Position.
 -- A 'move' is defined by final position at a certain depth resulting from a path.
 -- Hence, the same final position reached by a seperate path is counted as a seperate move.
--- Call with depth=0, perft_move_counter=0, nodes_till_now=0
-perft :: Position -> Bool -> Int -> Int -> Int -> IO (Int,Int)
-perft pos white_to_move depth perft_move_counter nodes_till_now = do
+-- Call with depth=0, perft_move_counter=0
+perft :: Position -> Bool -> Int -> Int -> IO Int
+perft pos white_to_move depth perft_move_counter = do
     --putStr "1"
     if (depth < perft_max_depth)
     then do
@@ -34,12 +35,9 @@ perft pos white_to_move depth perft_move_counter nodes_till_now = do
                 else possible_moves_b pos
         --putStrLn ""
         --print (C.length moves)
-        loop_i 0 pos white_to_move depth moves perft_move_counter nodes_till_now
+        loop_i 0 pos white_to_move depth moves perft_move_counter
     else do
-        --print perft_move_counter
-        return (perft_move_counter, nodes_till_now)
-
-{-
+        return perft_move_counter
 
 -- Takes as inputs Position and whose turn it is to move and returns the number of 'moves' from that Position.
 -- Also prints the number of 'moves' for each next immediate move.
@@ -60,16 +58,11 @@ perft_root pos white_to_move depth perft_move_counter perft_move_total_counter =
         --print perft_move_counter
         return perft_move_total_counter
 
--}
-
 -- Initially call with i=0
-loop_i :: Int -> Position -> Bool -> Int -> ByteString -> Int -> Int -> IO (Int, Int)
-loop_i i pos white_to_move depth moves perft_move_counter nodes_till_now = do
+loop_i :: Int -> Position -> Bool -> Int -> ByteString -> Int -> IO Int
+loop_i i pos white_to_move depth moves perft_move_counter = do
     if(i < C.length moves)
     then do
-        -- Just something to count the number of nodes explored
-        let nodes_till_now_mod = nodes_till_now + 1
-
         --print moves
         --print (slice moves i (i+4))
         let
@@ -119,16 +112,15 @@ loop_i i pos white_to_move depth moves perft_move_counter nodes_till_now = do
                         then (perft_move_counter+1)
                         else perft_move_counter
                 perft (Position wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt ept cwkt2 cwqt2 cbkt2 cbqt2)
-                        (not white_to_move) (depth+1) perft_move_counter_mod nodes_till_now_mod
+                        (not white_to_move) (depth+1) perft_move_counter_mod
             else
-                return (perft_move_counter, nodes_till_now_mod)
+                return perft_move_counter
 
         -- Looping
-        loop_i (i+4) pos white_to_move depth moves (fst pmcm3) (snd pmcm3)
+        loop_i (i+4) pos white_to_move depth moves pmcm3
 
-    else return (perft_move_counter, nodes_till_now)
+    else return perft_move_counter
 
-{-
 loop_j :: Int -> Position -> Bool -> Int -> ByteString -> Int -> Int -> IO Int
 loop_j j pos white_to_move depth moves perft_move_counter perft_move_total_counter = do
     if(j < C.length moves)
@@ -182,7 +174,7 @@ loop_j j pos white_to_move depth moves perft_move_counter perft_move_total_count
                         then (perft_move_counter+1)
                         else perft_move_counter
                 pmcm3 <- perft (Position wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt ept cwkt2 cwqt2 cbkt2 cbqt2)
-                        (not white_to_move) (depth+1) perft_move_counter_mod 0
+                        (not white_to_move) (depth+1) perft_move_counter_mod
                 putStrLn $ C.unpack ( move_to_algebra (slice moves j (j+4)) ) ++ " " ++ (show pmcm3)
                 let pmtc_mod = perft_move_total_counter + pmcm3
                 return pmtc_mod
@@ -193,8 +185,6 @@ loop_j j pos white_to_move depth moves perft_move_counter perft_move_total_count
         loop_j (j+4) pos white_to_move depth moves 0 pmtc_mod_2
 
     else return perft_move_total_counter
-
--}
 
 -- Slice the ByteString from index m to n, n exclusive
 slice :: ByteString -> Int -> Int -> ByteString

@@ -7,6 +7,7 @@ import Moves.HelperFunctions
 import Moves.Board
 import Moves.MakeMove
 import Moves.Perft
+import Moves.FenDebug
 import TimingDebug
 import Data.Bits
 import qualified Data.Word
@@ -43,14 +44,14 @@ vboard3 =   ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'
             ,'P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'
             ,'R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
 
--- Position constructed from the above vboard 
+-- Position constructed from the above vboard
 pos1 = vboard_to_pos vboard1
 pos2 = vboard_to_pos vboard2
 pos3 = vboard_to_pos vboard3
 
 -- A function for converting the visual board into a Postion datatype. Will be useful for debugging.
 vboard_to_pos :: [Char] -> Position
-vboard_to_pos vboard = 
+vboard_to_pos vboard =
     let vboard_modified = zip vboard [0..] -- A vboard that is a list of tuples like ('P', 54)
     in Position { wp = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'P']
                 , wn = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'N']
@@ -63,7 +64,7 @@ vboard_to_pos vboard =
                 , bb = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'b']
                 , br = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'r']
                 , bq = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'q']
-                , bk = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'k'] 
+                , bk = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'k']
                 , ep = 0
                 , cwk = False
                 , cwq = True
@@ -101,4 +102,3 @@ view4 bs =
         bs
     else
         (C.take 4 bs) `C.append` " " `C.append` (view4 $ C.drop 4 bs)
-        
