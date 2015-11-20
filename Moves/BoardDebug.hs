@@ -16,6 +16,16 @@ import qualified Data.ByteString.Char8 as C
 type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
 
+-- Just a few FEN Strings for perspective
+fen_ini = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+posfenini = import_fen fen1
+fen1 = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
+posfen1 = import_fen fen1
+
+-- After e1c1 of fen1, Black to play now
+debugfen = "r3k2r/1b4bq/8/8/8/8/7B/R3K2R w KQkq - 0 1"
+posdebug = import_fen debugfen
+
 -- Just a chess board that can be used for debugging
 vboard1 =   ['r', '-', '-', '-', 'k', '-', '-', 'r'
             ,'-', '-', 'p', '-', '-', 'p', 'P', '-'

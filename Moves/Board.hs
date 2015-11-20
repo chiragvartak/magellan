@@ -29,13 +29,15 @@ possible_moves_w pos = let
     occupied = (wp pos) .|. (wn pos) .|. (wb pos) .|. (wr pos) .|. (wq pos) .|. (wk pos) .|. (bp pos) .|. (bn pos)
                 .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos)
     empty = complement occupied
+    unsafe = unsafe_for_white (wp pos) (wn pos) (wb pos) (wr pos) (wq pos) (wk pos)
+                (bp pos) (bn pos) (bb pos) (br pos) (bq pos) (bk pos)
     list = possibleWP2 (wp pos) (bp pos) (ep pos) cannot_capture can_capture empty
             `C.append` possibleN occupied (wn pos) cannot_capture
             `C.append` possibleB occupied (wb pos) cannot_capture
             `C.append` possibleR occupied (wr pos) cannot_capture
             `C.append` possibleQ occupied (wq pos) cannot_capture
             `C.append` possibleK occupied (wk pos) cannot_capture
-            `C.append` possibleCW (wr pos) (cwk pos) (cwq pos) occupied
+            `C.append` possibleCW (wk pos) (wr pos) (cwk pos) (cwq pos) occupied unsafe
     in list
 
 possible_moves_b :: Position -> ByteString
@@ -45,11 +47,13 @@ possible_moves_b pos = let
     occupied = (wp pos) .|. (wn pos) .|. (wb pos) .|. (wr pos) .|. (wq pos) .|. (wk pos) .|. (bp pos) .|. (bn pos)
                 .|. (bb pos) .|. (br pos) .|. (bq pos) .|. (bk pos)
     empty = complement occupied
+    unsafe = unsafe_for_black (wp pos) (wn pos) (wb pos) (wr pos) (wq pos) (wk pos)
+                (bp pos) (bn pos) (bb pos) (br pos) (bq pos) (bk pos)
     list = possibleBP2 (wp pos) (bp pos) (ep pos) cannot_capture can_capture empty
             `C.append` possibleN occupied (bn pos) cannot_capture
             `C.append` possibleB occupied (bb pos) cannot_capture
             `C.append` possibleR occupied (br pos) cannot_capture
             `C.append` possibleQ occupied (bq pos) cannot_capture
             `C.append` possibleK occupied (bk pos) cannot_capture
-            `C.append` possibleCB (br pos) (cbk pos) (cbq pos) occupied
+            `C.append` possibleCB (bk pos) (br pos) (cbk pos) (cbq pos) occupied unsafe
     in list

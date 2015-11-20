@@ -17,7 +17,7 @@ import Data.Char (digitToInt, intToDigit, isDigit)
 type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
 
-perft_max_depth = 3
+perft_max_depth = 4
 
 -- Takes as inputs Position and whose turn it is to move and returns the number of 'moves' from that Position.
 -- A 'move' is defined by final position at a certain depth resulting from a path.
@@ -104,14 +104,14 @@ loop_i i pos white_to_move depth moves perft_move_counter = do
                 else (cwkt, cwqt, cbkt, cbqt)
 
         -- perft_move_counter_mod_3
-        pmcm3 <- if( ( ( wkt .&. unsafe_for_white wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt ) == 0 && white_to_move ) ||
-                    ( ( bkt .&. unsafe_for_black wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt ) == 0 && (not white_to_move) ) )
+        pmcm3 <- if( ( ( wkt .&. unsafe_for_white wpt wnt wbt wrt2 wqt wkt bpt bnt bbt brt2 bqt bkt ) == 0 && white_to_move ) ||
+                    ( ( bkt .&. unsafe_for_black wpt wnt wbt wrt2 wqt wkt bpt bnt bbt brt2 bqt bkt ) == 0 && (not white_to_move) ) )
             then do
                 let
                     perft_move_counter_mod = if (depth+1 == perft_max_depth)
                         then (perft_move_counter+1)
                         else perft_move_counter
-                perft (Position wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt ept cwkt2 cwqt2 cbkt2 cbqt2)
+                perft (Position wpt wnt wbt wrt2 wqt wkt bpt bnt bbt brt2 bqt bkt ept cwkt2 cwqt2 cbkt2 cbqt2)
                         (not white_to_move) (depth+1) perft_move_counter_mod
             else
                 return perft_move_counter
@@ -166,14 +166,14 @@ loop_j j pos white_to_move depth moves perft_move_counter perft_move_total_count
                 else (cwkt, cwqt, cbkt, cbqt)
 
         -- perft_move_counter_mod_3
-        pmtc_mod_2 <- if( ( ( wkt .&. unsafe_for_white wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt ) == 0 && white_to_move ) ||
-                    ( ( bkt .&. unsafe_for_black wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt ) == 0 && (not white_to_move) ) )
+        pmtc_mod_2 <- if( ( ( wkt .&. unsafe_for_white wpt wnt wbt wrt2 wqt wkt bpt bnt bbt brt2 bqt bkt ) == 0 && white_to_move ) ||
+                    ( ( bkt .&. unsafe_for_black wpt wnt wbt wrt2 wqt wkt bpt bnt bbt brt2 bqt bkt ) == 0 && (not white_to_move) ) )
             then do
                 let
                     perft_move_counter_mod = if (depth+1 == perft_max_depth)
                         then (perft_move_counter+1)
                         else perft_move_counter
-                pmcm3 <- perft (Position wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt ept cwkt2 cwqt2 cbkt2 cbqt2)
+                pmcm3 <- perft (Position wpt wnt wbt wrt2 wqt wkt bpt bnt bbt brt2 bqt bkt ept cwkt2 cwqt2 cbkt2 cbqt2)
                         (not white_to_move) (depth+1) perft_move_counter_mod
                 putStrLn $ C.unpack ( move_to_algebra (slice moves j (j+4)) ) ++ " " ++ (show pmcm3)
                 let pmtc_mod = perft_move_total_counter + pmcm3
@@ -191,12 +191,14 @@ slice :: ByteString -> Int -> Int -> ByteString
 slice str m n = C.drop m (C.take n str)
 
 move_to_algebra :: ByteString -> ByteString
-move_to_algebra move =
-    C.pack  [ char_add (C.index move 1) 49
-            , intToDigit ( fromEnum '8' - fromEnum (C.index move 0) )
-            , char_add (C.index move 3) 49
-            , intToDigit ( fromEnum '8' - fromEnum (C.index move 2) )
-            ]
+move_to_algebra move
+  | (isDigit $ C.index move 2) = C.pack  [ char_add (C.index move 1) 49
+                                      , intToDigit ( fromEnum '8' - fromEnum (C.index move 0) )
+                                      , char_add (C.index move 3) 49
+                                      , intToDigit ( fromEnum '8' - fromEnum (C.index move 2) )
+                                      ]
+  | (C.index move 2 == 'E') = "EPmo"
+  | otherwise = "PPro"
 
 -- Addition and subtraction of Chars
 char_add :: Char -> Int -> Char

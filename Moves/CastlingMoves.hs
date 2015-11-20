@@ -13,36 +13,42 @@ import qualified Data.ByteString.Char8 as C
 type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
 
-possibleCW :: Word64 -> Bool -> Bool -> Word64 -> ByteString
-possibleCW wr cwk cwq occupied = let
-	list1 = if (cwk
-				&& ( ( shiftL (1::Word64) (castle_rooks!!0) .&. wr ) /= 0 ) 
-				&& ( ( occupied .&. ( (shiftL (1::Word64) 61) .|. (shiftL (1::Word64) 62) ) ) == 0 )
-				)
-			then "7476"::ByteString
-			else ""
-	list2 = if (cwq
-				&& ( ( shiftL (1::Word64) (castle_rooks!!1) .&. wr ) /= 0 ) 
-				&& ( ( occupied .&. ( (shiftL (1::Word64) 57) .|. (shiftL (1::Word64) 58) .|. (shiftL (1::Word64) 59) ) ) == 0 )
-				)
-			then "7472"::ByteString
-			else ""
-	list = list1 `C.append` list2
-	in list
+possibleCW :: Word64 -> Word64 -> Bool -> Bool -> Word64 -> Word64 -> ByteString
+possibleCW wk wr cwk cwq occupied unsafe =
+   if (unsafe .&. wk == 0)
+      then let
+         list1 = if (cwk
+            && ( ( shiftL (1::Word64) (castle_rooks!!0) .&. wr ) /= 0 )
+            && ( ( (occupied .|. unsafe) .&. ( (shiftL (1::Word64) 61) .|. (shiftL (1::Word64) 62) ) ) == 0 )
+            )
+            then "7476"::ByteString
+            else ""
+         list2 = if (cwq
+            && ( ( shiftL (1::Word64) (castle_rooks!!1) .&. wr ) /= 0 )
+            && ( ( (occupied .|. (unsafe .&. complement (shiftL (1::Word64) 57))) .&. ( (shiftL (1::Word64) 57) .|. (shiftL (1::Word64) 58) .|. (shiftL (1::Word64) 59) ) ) == 0 )
+            )
+            then "7472"::ByteString
+            else ""
+         list = list1 `C.append` list2
+         in list
+   else ""
 
-possibleCB :: Word64 -> Bool -> Bool -> Word64 -> ByteString
-possibleCB br cbk cbq occupied = let
-	list1 = if (cbk
-				&& ( ( shiftL (1::Word64) (castle_rooks!!2) .&. br ) /= 0 ) 
-				&& ( ( occupied .&. ( (shiftL (1::Word64) 5) .|. (shiftL (1::Word64) 6) ) ) == 0 )
-				)
-			then "0406"::ByteString
-			else ""
-	list2 = if (cbq
-				&& ( ( shiftL (1::Word64) (castle_rooks!!3) .&. br ) /= 0 ) 
-				&& ( ( occupied .&. ( (shiftL (1::Word64) 1) .|. (shiftL (1::Word64) 2) .|. (shiftL (1::Word64) 3) ) ) == 0 )
-				)
-			then "0402"::ByteString
-			else ""
-	list = list1 `C.append` list2
-	in list
+possibleCB :: Word64 -> Word64 -> Bool -> Bool -> Word64 -> Word64 -> ByteString
+possibleCB bk br cbk cbq occupied unsafe =
+   if (unsafe .&. bk == 0)
+      then let
+      list1 = if (cbk
+         && ( ( shiftL (1::Word64) (castle_rooks!!2) .&. br ) /= 0 )
+         && ( ( (occupied .|. unsafe) .&. ( (shiftL (1::Word64) 5) .|. (shiftL (1::Word64) 6) ) ) == 0 )
+         )
+         then "0406"::ByteString
+         else ""
+      list2 = if (cbq
+         && ( ( shiftL (1::Word64) (castle_rooks!!3) .&. br ) /= 0 )
+         && ( ( (occupied .|. (unsafe .&. complement (shiftL (1::Word64) 1))) .&. ( (shiftL (1::Word64) 1) .|. (shiftL (1::Word64) 2) .|. (shiftL (1::Word64) 3) ) ) == 0 )
+         )
+         then "0402"::ByteString
+         else ""
+      list = list1 `C.append` list2
+      in list
+   else ""

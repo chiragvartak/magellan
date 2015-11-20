@@ -56,7 +56,7 @@ make_move board move piece_type
                 then board .&. complement ( (file_masks_8 !! (digitToInt (C.index move 1))) .&. (rank_masks_8 !! 3) )
                 else board .&. complement ( (file_masks_8 !! (digitToInt (C.index move 1))) .&. (rank_masks_8 !! 4) )
             board_mod_2 = if( (shiftR board_mod start) .&. 1 == 1 )
-                then 
+                then
                     let
                     board_1 = board_mod .&. complement ( shiftL (1::Word64) start )
                     board_2 = board_1 .|. shiftL (1::Word64) end
@@ -69,11 +69,11 @@ make_move_castle :: Word64 -> Word64 -> ByteString -> Char -> Word64
 make_move_castle rook_board king_board move piece_type =
     let
     start = (digitToInt (C.index move 0))*8 + digitToInt (C.index move 1)
-    return_rook_board = if ( ((shiftR king_board start) .&. 1) == 1         -- Regular Move
-                            || ( move == "0402" )
+    return_rook_board = if ( (((shiftR king_board start) .&. 1) == 1)         -- Regular Move
+                            && ( ( move == "0402" )
                             || ( move == "0406" )
                             || ( move == "7472" )
-                            || ( move == "7476" )
+                            || ( move == "7476" ) )
                         )
         then if(piece_type == 'R')
             then
@@ -88,6 +88,7 @@ make_move_castle rook_board king_board move piece_type =
                         rook_board_1 = rook_board .&. complement ( shiftL (1::Word64) (castle_rooks!!0) )
                         rook_board_2 = rook_board_1 .|. ( shiftL (1::Word64) (castle_rooks!!0 - 2) )
                         in rook_board_2
+                    xs -> rook_board
             else
                 case move of
                     "0402" ->
@@ -100,6 +101,7 @@ make_move_castle rook_board king_board move piece_type =
                         rook_board_1 = rook_board .&. complement ( shiftL (1::Word64) (castle_rooks!!2) )
                         rook_board_2 = rook_board_1 .|. ( shiftL (1::Word64) (castle_rooks!!2 - 2) )
                         in rook_board_2
+                    xs -> rook_board
         else
             rook_board
     in return_rook_board
