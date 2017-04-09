@@ -12,6 +12,8 @@ import Data.Bits
 import qualified Data.ByteString.Char8 as C
 import Data.Char (digitToInt, isDigit, isUpper)
 
+import Debug.Trace (trace)
+
 type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
 
@@ -106,12 +108,12 @@ make_move_castle rook_board king_board move piece_type =
             rook_board
     in return_rook_board
 
-
+-- This might a problem with it. It uses Jonathan's old en passant move notation.
 make_move_ep :: Word64 -> ByteString -> Word64
 make_move_ep board move =
     let
     start = (digitToInt (C.index move 0))*8 + digitToInt (C.index move 1)
-    return_board = if( ( isDigit $ C.index move 3 )
+    return_board =  if ( ( isDigit $ C.index move 3 )
                     && ( ( digitToInt (C.index move 0) - digitToInt (C.index move 2) ) `elem` [-2,2] )
                     && ( ( ( shiftR board start ) .&. 1 ) == 1 )
                     )

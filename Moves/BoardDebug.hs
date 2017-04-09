@@ -12,6 +12,7 @@ import TimingDebug
 import Data.Bits
 import qualified Data.Word
 import qualified Data.ByteString.Char8 as C
+import qualified Data.Text as T
 
 type Word64 = Data.Word.Word64
 type ByteString = C.ByteString
@@ -21,6 +22,12 @@ fen_ini = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 posfenini = import_fen fen1
 fen1 = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
 posfen1 = import_fen fen1
+--Check en passant
+fenep = "r1bqk2r/1pp1bppp/p1n1pn2/2Pp4/3P4/2N1PN1P/PP3PP1/R1BQKB1R b KQkq -"
+posfenep = import_fen fenep
+-- A Position to check all the variety of moves
+fenvari = "r3k2r/pPq4p/2p1np2/BnPpp3/1p1PPP2/1P3QpN/2N1B2P/R3K2R w KQkq d6 0 1"
+posfenvari = import_fen fenvari
 
 -- After e1c1 of fen1, Black to play now
 debugfen = "r3k2r/1b4bq/8/8/8/8/7B/R3K2R w KQkq - 0 1"
@@ -76,7 +83,7 @@ vboard_to_pos vboard =
                 , bq = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'q']
                 , bk = int_list_to_bitboard [snd tuple | tuple <- vboard_modified, fst tuple == 'k']
                 , ep = 0
-                , cwk = False
+                , cwk = True
                 , cwq = True
                 , cbk = True
                 , cbq = True
@@ -112,3 +119,38 @@ view4 bs =
         bs
     else
         (C.take 4 bs) `C.append` " " `C.append` (view4 $ C.drop 4 bs)
+
+-- Make a move on all the bitboards
+-- Be careful! Laziness may cause very little to be evaluated.
+debug_bitboards :: Position -> ByteString -> Position    -- Just a dummy Position to return
+debug_bitboards pos move =
+   let
+   wpt = make_move (wp pos) move 'P'
+   wnt = make_move (wn pos) move 'N'
+   wbt = make_move (wb pos) move 'B'
+   wrt = make_move (wr pos) move 'R'
+   wqt = make_move (wq pos) move 'Q'
+   wkt = make_move (wk pos) move 'K'
+   bpt = make_move (bp pos) move 'p'
+   bnt = make_move (bn pos) move 'n'
+   bbt = make_move (bb pos) move 'b'
+   brt = make_move (br pos) move 'r'
+   bqt = make_move (bq pos) move 'q'
+   bkt = make_move (bk pos) move 'k'
+   in (Position wpt wnt wbt wrt wqt wkt bpt bnt bbt brt bqt bkt (ep pos) (cwk pos) (cwq pos) (cbk pos) (cbq pos))
+
+-- pos: The position from which you want to test
+-- moves: A [ByteString] which has all the moves from the pos
+debug_moves :: Position -> [ByteString] -> Position     -- Again, just a dummy Position to return
+debug_moves pos moves = foldl (debug_bitboards) pos moves
+
+-- Get the desired [ByteString]
+bs_list :: [ByteString]
+bs_list =
+   let
+   bs1 = possible_moves_w posfenvari
+   bs2 = view4 bs1
+   str1 = C.unpack bs2
+   t1 = T.splitOn " " (T.pack str1)
+   bs_l = [C.pack (T.unpack ele) | ele <- t1]
+   in bs_l
